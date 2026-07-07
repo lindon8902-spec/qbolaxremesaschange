@@ -368,9 +368,7 @@
     <div class="flap-note">Envía como "Amigos y familiares" y sube tu comprobante</div>
   </div>
 
-  <form id="orderForm" name="orden-cambio" data-netlify="true" netlify-honeypot="bot-field">
-    <input type="hidden" name="form-name" value="orden-cambio">
-    <p style="display:none;"><label>No llenar: <input name="bot-field"></label></p>
+  <form id="orderForm" name="orden-cambio">
     <input type="hidden" name="codigo" id="hiddenCodigo">
     <input type="hidden" name="recibe_cup" id="hiddenResultado">
     <div class="field">
@@ -562,13 +560,6 @@ WhatsApp: ${contactValue}
 Cuenta destino: ${destAccount}
 Referencia de pago: ${reference}`;
 
-    // --- Envío a Netlify Forms (llega por correo) ---
-    const netlifyPromise = (async () => {
-      const netlifyData = new FormData(document.getElementById('orderForm'));
-      const resp = await fetch('/', { method: 'POST', body: netlifyData });
-      if (!resp.ok) throw new Error('Netlify Forms respondió con error');
-    })();
-
     // --- Envío a Telegram (llega al instante) ---
     const telegramPromise = (async () => {
       let resp;
@@ -591,11 +582,8 @@ Referencia de pago: ${reference}`;
       if (!resp.ok) throw new Error('Telegram respondió con error');
     })();
 
-    const outcomes = await Promise.allSettled([netlifyPromise, telegramPromise]);
-    const anyOk = outcomes.some(o => o.status === 'fulfilled');
-
     try {
-      if (!anyOk) throw new Error('Ningún canal de notificación respondió');
+      await telegramPromise;
 
       statusEl.className = 'status show ok';
       statusEl.innerHTML = `✅ Orden enviada. Tu código de seguimiento es <code>${code}</code>. Te contactaremos por WhatsApp en breve.`;
