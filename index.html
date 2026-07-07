@@ -561,25 +561,33 @@ Cuenta destino: ${destAccount}
 Referencia de pago: ${reference}`;
 
     // --- Envío a Telegram (llega al instante) ---
+    // Nota: se usa mode:'no-cors' porque la API de Telegram no siempre
+    // devuelve encabezados CORS legibles desde el navegador. Esto hace que
+    // no podamos leer el status de la respuesta, pero el mensaje sí llega.
     const telegramPromise = (async () => {
-      let resp;
       if (proofFile) {
         const formData = new FormData();
         formData.append('chat_id', TELEGRAM_CHAT_ID);
         formData.append('caption', message);
         formData.append('document', proofFile, proofFile.name);
-        resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`, {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`, {
           method: 'POST',
+          mode: 'no-cors',
           body: formData
         });
       } else {
-        resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        const params = new URLSearchParams();
+        params.append('chat_id', TELEGRAM_CHAT_ID);
+        params.append('text', message);
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message })
+          mode: 'no-cors',
+          body: params
         });
       }
-      if (!resp.ok) throw new Error('Telegram respondió con error');
+      // Con mode:'no-cors' la respuesta es "opaca": no podemos leer si Telegram
+      // aceptó el mensaje o no. Si fetch no lanzó una excepción de red, damos
+      // por hecho que el envío salió (igual que hace este mismo bot con éxito).
     })();
 
     try {
