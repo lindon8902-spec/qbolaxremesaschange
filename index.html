@@ -61,6 +61,100 @@
   }
   .sub{color:var(--text-dim);font-size:14.5px;line-height:1.5;margin:0;}
 
+  /* --- Banner de ayuda / paso a paso --- */
+  .help-banner{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--surface-raised);
+    border:1px solid var(--gold);
+    border-radius:var(--radius);
+    padding:12px 16px;
+    margin:18px 0 0;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .help-banner:hover{ background:rgba(201,162,39,0.12); }
+  .help-icon{
+    flex:0 0 auto;
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:var(--gold);
+    color:var(--bg);
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:17px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .help-banner-text{ flex:1; }
+  .help-banner-text strong{ display:block; font-size:14px; color:var(--text); }
+  .help-banner-text span{ font-size:12.5px; color:var(--text-dim); }
+  .help-arrow{ color:var(--gold); font-size:18px; flex:0 0 auto; }
+
+  .help-modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(8,14,13,0.75);
+    z-index:100;
+    align-items:flex-start;
+    justify-content:center;
+    padding:32px 16px;
+    overflow-y:auto;
+  }
+  .help-modal-overlay.open{ display:flex; }
+  .help-modal{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    max-width:480px;
+    width:100%;
+    padding:24px;
+    position:relative;
+  }
+  .help-modal h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:22px;
+    margin:0 0 4px;
+    color:var(--text);
+  }
+  .help-modal .sub{ margin-bottom:18px; }
+  .help-close{
+    position:absolute;
+    top:16px;
+    right:16px;
+    background:none;
+    border:none;
+    color:var(--text-dim);
+    font-size:22px;
+    line-height:1;
+    cursor:pointer;
+  }
+  .help-close:hover{ color:var(--text); }
+  .help-steps{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; }
+  .help-steps li{ display:flex; gap:12px; }
+  .help-step-num{
+    flex:0 0 auto;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:var(--surface-raised);
+    border:1px solid var(--gold);
+    color:var(--gold);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .help-step-text strong{ display:block; font-size:14px; color:var(--text); margin-bottom:2px; }
+  .help-step-text p{ margin:0; font-size:13px; color:var(--text-dim); line-height:1.45; }
+
   /* --- Split-flap rate board --- */
   .board{
     background:var(--surface);
@@ -72,7 +166,7 @@
     grid-template-columns:1fr 1fr;
     gap:14px;
   }
-  .flap-cell{text-align:center;}
+  .flap-cell{text-align:center;display:flex;flex-direction:column;}
   .flap-label{
     font-family:'IBM Plex Mono',monospace;
     font-size:10px;
@@ -80,6 +174,11 @@
     text-transform:uppercase;
     color:var(--text-dim);
     margin-bottom:8px;
+    flex:1;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    line-height:1.3;
   }
   .flap-value{
     font-family:'IBM Plex Mono',monospace;
@@ -323,7 +422,68 @@
     <p class="sub">Completa los datos, realiza tu transferencia y adjunta el comprobante. Verificamos manualmente y te confirmamos por Telegram/WhatsApp.</p>
   </header>
 
-  <div class="board" id="board">
+  <div class="help-banner" id="helpBanner">
+    <div class="help-icon">?</div>
+    <div class="help-banner-text">
+      <strong>¿Primera vez aquí?</strong>
+      <span>Toca para ver la explicación completa, paso a paso</span>
+    </div>
+    <div class="help-arrow">›</div>
+  </div>
+
+  <div class="help-modal-overlay" id="helpOverlay">
+    <div class="help-modal">
+      <button type="button" class="help-close" id="helpClose" aria-label="Cerrar">×</button>
+      <h2>Cómo funciona Q'bolax</h2>
+      <p class="sub">Sigue estos pasos para completar tu orden de cambio.</p>
+      <ol class="help-steps">
+        <li>
+          <div class="help-step-num">1</div>
+          <div class="help-step-text">
+            <strong>Elige la moneda y la modalidad</strong>
+            <p>Rublos, euros, o rublos con entrega en efectivo. Cada una tiene su propia tasa, visible arriba en el tablero.</p>
+          </div>
+        </li>
+        <li>
+          <div class="help-step-num">2</div>
+          <div class="help-step-text">
+            <strong>Revisa cuánto vas a recibir</strong>
+            <p>Escribe el monto que envías y el formulario calcula al instante lo que recibirás en CUP.</p>
+          </div>
+        </li>
+        <li>
+          <div class="help-step-num">3</div>
+          <div class="help-step-text">
+            <strong>Realiza tu transferencia (o prepara el efectivo)</strong>
+            <p>Usa los datos de tarjeta, teléfono o PayPal que aparecen en pantalla según la moneda elegida.</p>
+          </div>
+        </li>
+        <li>
+          <div class="help-step-num">4</div>
+          <div class="help-step-text">
+            <strong>Completa tus datos</strong>
+            <p>Nombre, WhatsApp, y según la modalidad: cuenta destino, o dirección/teléfono/CI de quien recibirá el efectivo.</p>
+          </div>
+        </li>
+        <li>
+          <div class="help-step-num">5</div>
+          <div class="help-step-text">
+            <strong>Envía la orden</strong>
+            <p>Guarda el código de seguimiento que te aparece — lo necesitarás para consultar el estado más abajo en esta misma página.</p>
+          </div>
+        </li>
+        <li>
+          <div class="help-step-num">6</div>
+          <div class="help-step-text">
+            <strong>Confirmamos por WhatsApp</strong>
+            <p>Verificamos tu orden manualmente y te contactamos para coordinar la entrega o el pago.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="board" id="board" style="grid-template-columns:1fr 1fr 1fr;">
     <div class="flap-cell">
       <div class="flap-label">1 RUB equivale a</div>
       <div class="flap-value" id="rateRubCup">—</div>
@@ -331,6 +491,10 @@
     <div class="flap-cell">
       <div class="flap-label">1 EUR equivale a</div>
       <div class="flap-value" id="rateEurCup">—</div>
+    </div>
+    <div class="flap-cell">
+      <div class="flap-label">1 RUB en efectivo equivale a</div>
+      <div class="flap-value" id="rateRubCashCup">—</div>
     </div>
     <div class="flap-note">Tasas de referencia · ajusta las constantes RATES en el código</div>
   </div>
@@ -376,6 +540,7 @@
       <select id="currency" name="moneda">
         <option value="RUB">Rublos (RUB)</option>
         <option value="EUR">Euros (EUR)</option>
+        <option value="RUB_CASH">Rublos — recibes en efectivo (RUB)</option>
       </select>
     </div>
 
@@ -402,21 +567,35 @@
       <input type="tel" id="contactValue" name="whatsapp" placeholder="+53 5xxxxxxx" required>
     </div>
 
-    <div class="field">
+    <div class="field" id="destAccountField">
       <label for="destAccount">Cuenta/datos destino donde recibirás</label>
-      <textarea id="destAccount" name="cuenta_destino" placeholder="Ej: tarjeta MIR, cuenta CUP, wallet, etc." required></textarea>
+      <textarea id="destAccount" name="cuenta_destino" placeholder="Ej: tarjeta MIR, cuenta CUP, wallet, etc."></textarea>
     </div>
 
-    <div class="field">
+    <div class="field" id="cashFields" style="display:none;">
+      <label for="cashAddress">Dirección de entrega en efectivo</label>
+      <textarea id="cashAddress" name="direccion_entrega" placeholder="Calle, número, entre calles, municipio, provincia, puntos de referencia"></textarea>
+    </div>
+    <div class="field" id="cashPhoneField" style="display:none;">
+      <label for="cashPhone">Teléfono del destinatario (quien recibe el efectivo)</label>
+      <input type="tel" id="cashPhone" name="telefono_destinatario" placeholder="+53 5xxxxxxx">
+    </div>
+    <div class="field" id="cashCIField" style="display:none;">
+      <label for="cashCI">Foto del carnet de identidad (CI) del destinatario</label>
+      <input type="file" id="cashCI" name="foto_ci" accept="image/*">
+      <p class="hint">Necesaria para verificar la identidad de quien recibirá el efectivo.</p>
+    </div>
+
+    <div class="field" id="referenceField">
       <label for="reference">Referencia de tu transferencia</label>
       <input type="text" id="reference" name="referencia_pago" placeholder="Número de operación, últimos 4 dígitos, etc." required>
       <p class="hint">Realiza primero la transferencia y coloca aquí el número o código que la identifica.</p>
     </div>
 
-    <div class="field">
+    <div class="field" id="proofField">
       <label for="proof">Comprobante de pago (PDF)</label>
-      <input type="file" id="proof" name="comprobante" accept="application/pdf" required>
-      <p class="hint">Sube el PDF de tu transferencia o comprobante de pago.</p>
+      <input type="file" id="proof" name="comprobante" accept="application/pdf,image/*" required>
+      <p class="hint">Sube el PDF o una foto de tu transferencia o comprobante de pago.</p>
     </div>
 
     <button type="submit" id="submitBtn">Enviar orden</button>
@@ -442,10 +621,12 @@
   const STATUS_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1wQnUe2dzR6Ukz4LjhTXD2TiSyOLsWSLOvEL2XR5V3Ws/export?format=csv&gid=0";
   // ---- 1. TASAS DE REFERENCIA (edítalas aquí) ----
   const RATES = {
-    RUB_PER_USDT: 84,       // valor de compra: cuántos RUB equivalen a 1 USDT
-    CUP_PER_USDT: 858,      // cuántos CUP equivalen a 1 USDT
-    MARGIN_CUP_PER_RUB: 0.70, // tu ganancia por cada RUB cambiado
-    CUP_PER_EUR: 720       // valor fijo publicado: cuántos CUP equivalen a 1 EUR
+    RUB_PER_USDT: 83,       // valor de compra: cuántos RUB equivalen a 1 USDT
+    CUP_PER_USDT: 900,      // valor de venta: cuántos CUP equivalen a 1 USDT
+    MARGIN_CUP_PER_RUB: 0.70, // tu ganancia por cada RUB cambiado (transferencia normal)
+    CUP_PER_EUR: 720,      // valor fijo publicado: cuántos CUP equivalen a 1 EUR
+    CUP_PER_USDT_CASH: 675,  // valor de venta del USDT específico para la modalidad "recibes en efectivo"
+    MARGIN_CUP_PER_RUB_CASH: 1.7  // tu ganancia por cada RUB cambiado en la modalidad efectivo
   };
 
   // ---- CUENTA/TELÉFONO DONDE EL CLIENTE DEBE TRANSFERIR SUS RUBLOS ----
@@ -471,11 +652,20 @@
     return RATES.CUP_PER_EUR;
   }
 
+  function clientRateRubCash(){
+    // Modalidad "recibes en efectivo": RUB -> USDT (compra 83) -> CUP (venta efectivo 675),
+    // y se resta la ganancia por cada RUB, igual que en la calculadora de referencia.
+    const costRate = RATES.CUP_PER_USDT_CASH / RATES.RUB_PER_USDT;
+    return costRate - RATES.MARGIN_CUP_PER_RUB_CASH;
+  }
+
   function renderRates(){
     document.getElementById('rateRubCup').innerHTML =
       `<span class="digit">${clientRateRub().toFixed(2)} CUP</span>`;
     document.getElementById('rateEurCup').innerHTML =
       `<span class="digit">${clientRateEur().toFixed(2)} CUP</span>`;
+    document.getElementById('rateRubCashCup').innerHTML =
+      `<span class="digit">${clientRateRubCash().toFixed(2)} CUP</span>`;
     document.getElementById('payToCard').textContent = PAY_TO_CARD;
     document.getElementById('payToHolder').textContent = PAY_TO_HOLDER;
     document.getElementById('payToPhone').textContent = PAY_TO_PHONE;
@@ -485,12 +675,45 @@
   }
   renderRates();
 
+  // ---- Modal de ayuda / paso a paso ----
+  const helpBanner = document.getElementById('helpBanner');
+  const helpOverlay = document.getElementById('helpOverlay');
+  const helpClose = document.getElementById('helpClose');
+  helpBanner.addEventListener('click', () => helpOverlay.classList.add('open'));
+  helpClose.addEventListener('click', () => helpOverlay.classList.remove('open'));
+  helpOverlay.addEventListener('click', (e) => {
+    if (e.target === helpOverlay) helpOverlay.classList.remove('open');
+  });
+
   function updateCurrencyView(){
     const currency = document.getElementById('currency').value;
+    const isCash = currency === 'RUB_CASH';
     document.getElementById('amountLabel').textContent =
-      currency === 'RUB' ? 'Envías (RUB)' : 'Envías (EUR)';
-    document.getElementById('rubBoard').style.display = currency === 'RUB' ? '' : 'none';
+      currency === 'RUB' ? 'Envías (RUB)' :
+      currency === 'EUR' ? 'Envías (EUR)' :
+      'Envías (RUB) — recibes en efectivo';
+    // La modalidad en efectivo envía rublos igual que la modalidad normal,
+    // por eso comparte el mismo tablero de pago (tarjeta/teléfono).
+    document.getElementById('rubBoard').style.display = (currency === 'RUB' || currency === 'RUB_CASH') ? '' : 'none';
     document.getElementById('eurBoard').style.display = currency === 'EUR' ? '' : 'none';
+
+    // Cuenta destino (transferencia normal) vs. datos de entrega en efectivo
+    document.getElementById('destAccountField').style.display = isCash ? 'none' : '';
+    document.getElementById('destAccount').required = !isCash;
+
+    document.getElementById('cashFields').style.display = isCash ? '' : 'none';
+    document.getElementById('cashPhoneField').style.display = isCash ? '' : 'none';
+    document.getElementById('cashCIField').style.display = isCash ? '' : 'none';
+    document.getElementById('cashAddress').required = isCash;
+    document.getElementById('cashPhone').required = isCash;
+    document.getElementById('cashCI').required = isCash;
+
+    // La modalidad efectivo no pide comprobante de pago ni referencia de transferencia
+    document.getElementById('proofField').style.display = isCash ? 'none' : '';
+    document.getElementById('proof').required = !isCash;
+    document.getElementById('referenceField').style.display = isCash ? 'none' : '';
+    document.getElementById('reference').required = !isCash;
+
     computeResult();
   }
   document.getElementById('currency').addEventListener('change', updateCurrencyView);
@@ -520,7 +743,10 @@
   function computeResult(){
     const amount = parseFloat(document.getElementById('amount').value) || 0;
     const currency = document.getElementById('currency').value;
-    const rate = currency === 'RUB' ? clientRateRub() : clientRateEur();
+    const rate =
+      currency === 'RUB' ? clientRateRub() :
+      currency === 'EUR' ? clientRateEur() :
+      clientRateRubCash();
     const result = amount * rate;
     document.getElementById('resultValue').textContent = result.toFixed(2);
     return result;
@@ -540,25 +766,37 @@
 
     const amount = document.getElementById('amount').value;
     const currency = document.getElementById('currency').value;
+    const isCash = currency === 'RUB_CASH';
     const result = computeResult();
     const name = document.getElementById('name').value;
     const contactValue = document.getElementById('contactValue').value;
     const destAccount = document.getElementById('destAccount').value;
+    const cashAddress = document.getElementById('cashAddress').value;
+    const cashPhone = document.getElementById('cashPhone').value;
+    const ciFile = document.getElementById('cashCI').files[0];
     const reference = document.getElementById('reference').value;
     const proofFile = document.getElementById('proof').files[0];
     const code = trackingCode();
     document.getElementById('hiddenCodigo').value = code;
     document.getElementById('hiddenResultado').value = result.toFixed(2);
 
+    const modalidadLabel =
+      currency === 'RUB' ? 'RUB → CUP' :
+      currency === 'EUR' ? 'EUR → CUP' :
+      'RUB → CUP EN EFECTIVO';
+
+    const entregaInfo = isCash
+      ? `Dirección de entrega: ${cashAddress}\nTeléfono del destinatario: ${cashPhone}\nFoto de CI: ${ciFile ? 'adjunta en mensaje aparte' : 'NO ADJUNTADA'}`
+      : `Cuenta destino: ${destAccount}`;
+
     const message =
 `🆕 Nueva orden Q'bolax [${code}]
-Dirección: ${currency} → CUP
-Envía: ${amount} ${currency}
-Recibe (estimado): ${result.toFixed(2)} CUP
+Dirección: ${modalidadLabel}
+Envía: ${amount} ${currency === 'RUB_CASH' ? 'RUB' : currency}
+Recibe (estimado): ${result.toFixed(2)} CUP${currency === 'RUB_CASH' ? ' (EN EFECTIVO)' : ''}
 Nombre: ${name}
 WhatsApp: ${contactValue}
-Cuenta destino: ${destAccount}
-Referencia de pago: ${reference}`;
+${entregaInfo}${isCash ? '' : `\nReferencia de pago: ${reference}`}`;
 
     // --- Envío a Telegram (llega al instante) ---
     // Nota: se usa mode:'no-cors' porque la API de Telegram no siempre
@@ -588,6 +826,19 @@ Referencia de pago: ${reference}`;
       // Con mode:'no-cors' la respuesta es "opaca": no podemos leer si Telegram
       // aceptó el mensaje o no. Si fetch no lanzó una excepción de red, damos
       // por hecho que el envío salió (igual que hace este mismo bot con éxito).
+
+      // Si es modalidad efectivo y hay foto de CI, la mandamos como mensaje aparte
+      if (isCash && ciFile) {
+        const ciFormData = new FormData();
+        ciFormData.append('chat_id', TELEGRAM_CHAT_ID);
+        ciFormData.append('caption', `📄 CI del destinatario — orden [${code}]`);
+        ciFormData.append('photo', ciFile, ciFile.name);
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: ciFormData
+        });
+      }
     })();
 
     try {
