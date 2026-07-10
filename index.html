@@ -573,8 +573,20 @@
     </div>
 
     <div class="field" id="cashFields" style="display:none;">
-      <label for="cashAddress">Dirección de entrega en efectivo</label>
-      <textarea id="cashAddress" name="direccion_entrega" placeholder="Calle, número, entre calles, municipio, provincia, puntos de referencia"></textarea>
+      <label for="cashProvincia">Provincia de entrega</label>
+      <select id="cashProvincia" name="provincia_entrega">
+        <option value="">Selecciona la provincia</option>
+      </select>
+    </div>
+    <div class="field" id="cashMunicipioField" style="display:none;">
+      <label for="cashMunicipio">Municipio</label>
+      <select id="cashMunicipio" name="municipio_entrega" disabled>
+        <option value="">Primero selecciona la provincia</option>
+      </select>
+    </div>
+    <div class="field" id="cashAddressField" style="display:none;">
+      <label for="cashAddress">Dirección de la casa</label>
+      <textarea id="cashAddress" name="direccion_entrega" placeholder="Calle, número, entre calles, puntos de referencia"></textarea>
     </div>
     <div class="field" id="cashPhoneField" style="display:none;">
       <label for="cashPhone">Teléfono del destinatario (quien recibe el efectivo)</label>
@@ -675,6 +687,62 @@
   }
   renderRates();
 
+  // ---- Provincias y municipios de Cuba (selects encadenados) ----
+  const PROVINCIAS_MUNICIPIOS = {
+    "Pinar del Río": ["Sandino","Mantua","Minas de Matahambre","Viñales","La Palma","Consolación del Sur","Pinar del Río","San Luis","San Juan y Martínez","Guane","Los Palacios"],
+    "Artemisa": ["Bahía Honda","Mariel","Guanajay","Caimito","Bauta","San Antonio de los Baños","Güira de Melena","Alquízar","Artemisa","Candelaria","San Cristóbal"],
+    "La Habana": ["Playa","Plaza de la Revolución","Centro Habana","La Habana Vieja","Regla","La Habana del Este","Guanabacoa","San Miguel del Padrón","Diez de Octubre","Cerro","Marianao","La Lisa","Boyeros","Arroyo Naranjo","Cotorro"],
+    "Mayabeque": ["Bejucal","San José de las Lajas","Jaruco","Santa Cruz del Norte","Madruga","Nueva Paz","San Nicolás","Güines","Melena del Sur","Batabanó","Quivicán"],
+    "Matanzas": ["Matanzas","Cárdenas","Martí","Colón","Perico","Jovellanos","Pedro Betancourt","Limonar","Unión de Reyes","Los Arabos","Jagüey Grande","Calimete","Ciénaga de Zapata"],
+    "Cienfuegos": ["Cienfuegos","Cruces","Cumanayagua","Palmira","Rodas","Aguada de Pasajeros","Lajas","Abreus"],
+    "Villa Clara": ["Corralillo","Quemado de Güines","Sagua la Grande","Encrucijada","Camajuaní","Caibarién","Remedios","Placetas","Santa Clara","Cifuentes","Santo Domingo","Ranchuelo","Manicaragua"],
+    "Sancti Spíritus": ["Yaguajay","Cabaiguán","Fomento","Trinidad","Sancti Spíritus","Jatibonico","Taguasco","La Sierpe"],
+    "Ciego de Ávila": ["Chambas","Morón","Bolivia","Primero de Enero","Ciro Redondo","Florencia","Majagua","Ciego de Ávila","Venezuela","Baraguá"],
+    "Camagüey": ["Carlos Manuel de Céspedes","Esmeralda","Sierra de Cubitas","Minas","Nuevitas","Camagüey","Guáimaro","Sibanicú","Vertientes","Jimaguayú","Najasa","Santa Cruz del Sur","Florida"],
+    "Las Tunas": ["Manatí","Puerto Padre","Jesús Menéndez","Majibacoa","Las Tunas","Jobabo","Colombia","Amancio"],
+    "Holguín": ["Gibara","Rafael Freyre","Banes","Antilla","Báguanos","Holguín","Calixto García","Cacocum","Urbano Noris","Cueto","Mayarí","Frank País","Sagua de Tánamo","Moa"],
+    "Granma": ["Río Cauto","Cauto Cristo","Jiguaní","Bayamo","Yara","Manzanillo","Campechuela","Media Luna","Niquero","Pilón","Bartolomé Masó","Buey Arriba","Guisa"],
+    "Santiago de Cuba": ["Songo-La Maya","Segundo Frente","Mella","Santiago de Cuba","San Luis","Palma Soriano","Contramaestre","Tercer Frente","Guamá"],
+    "Guantánamo": ["Baracoa","Maisí","San Antonio del Sur","Imías","Yateras","Guantánamo","El Salvador","Manuel Tames","Caimanera","Niceto Pérez"],
+    "Isla de la Juventud": ["Isla de la Juventud"]
+  };
+
+  const cashProvinciaEl = document.getElementById('cashProvincia');
+  const cashMunicipioEl = document.getElementById('cashMunicipio');
+  const cashMunicipioField = document.getElementById('cashMunicipioField');
+  const cashAddressField = document.getElementById('cashAddressField');
+
+  Object.keys(PROVINCIAS_MUNICIPIOS).forEach(prov => {
+    const opt = document.createElement('option');
+    opt.value = prov;
+    opt.textContent = prov;
+    cashProvinciaEl.appendChild(opt);
+  });
+
+  cashProvinciaEl.addEventListener('change', () => {
+    const prov = cashProvinciaEl.value;
+    cashMunicipioEl.innerHTML = '';
+    if (!prov) {
+      cashMunicipioEl.disabled = true;
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'Primero selecciona la provincia';
+      cashMunicipioEl.appendChild(opt);
+      return;
+    }
+    cashMunicipioEl.disabled = false;
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Selecciona el municipio';
+    cashMunicipioEl.appendChild(placeholder);
+    PROVINCIAS_MUNICIPIOS[prov].forEach(mun => {
+      const opt = document.createElement('option');
+      opt.value = mun;
+      opt.textContent = mun;
+      cashMunicipioEl.appendChild(opt);
+    });
+  });
+
   // ---- Modal de ayuda / paso a paso ----
   const helpBanner = document.getElementById('helpBanner');
   const helpOverlay = document.getElementById('helpOverlay');
@@ -702,8 +770,12 @@
     document.getElementById('destAccount').required = !isCash;
 
     document.getElementById('cashFields').style.display = isCash ? '' : 'none';
+    document.getElementById('cashMunicipioField').style.display = isCash ? '' : 'none';
+    document.getElementById('cashAddressField').style.display = isCash ? '' : 'none';
     document.getElementById('cashPhoneField').style.display = isCash ? '' : 'none';
     document.getElementById('cashCIField').style.display = isCash ? '' : 'none';
+    document.getElementById('cashProvincia').required = isCash;
+    document.getElementById('cashMunicipio').required = isCash;
     document.getElementById('cashAddress').required = isCash;
     document.getElementById('cashPhone').required = isCash;
     document.getElementById('cashCI').required = isCash;
@@ -771,6 +843,8 @@
     const name = document.getElementById('name').value;
     const contactValue = document.getElementById('contactValue').value;
     const destAccount = document.getElementById('destAccount').value;
+    const cashProvincia = document.getElementById('cashProvincia').value;
+    const cashMunicipio = document.getElementById('cashMunicipio').value;
     const cashAddress = document.getElementById('cashAddress').value;
     const cashPhone = document.getElementById('cashPhone').value;
     const ciFile = document.getElementById('cashCI').files[0];
@@ -786,7 +860,7 @@
       'RUB → CUP EN EFECTIVO';
 
     const entregaInfo = isCash
-      ? `Dirección de entrega: ${cashAddress}\nTeléfono del destinatario: ${cashPhone}\nFoto de CI: ${ciFile ? 'adjunta en mensaje aparte' : 'NO ADJUNTADA'}`
+      ? `Provincia: ${cashProvincia}\nMunicipio: ${cashMunicipio}\nDirección de la casa: ${cashAddress}\nTeléfono del destinatario: ${cashPhone}\nFoto de CI: ${ciFile ? 'adjunta en mensaje aparte' : 'NO ADJUNTADA'}`
       : `Cuenta destino: ${destAccount}`;
 
     const message =
